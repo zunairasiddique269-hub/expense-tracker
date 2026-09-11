@@ -5,6 +5,7 @@ function App() {
   const [expenseName, setExpenseName] = useState('')
 const [amount, setAmount] = useState('')
 const [category, setCategory] = useState('Food')
+const [date, setDate] = useState('')
 
 const [editingIndex, setEditingIndex] = useState(null)
 const total = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
@@ -37,6 +38,11 @@ const total = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
   <option value="Bills">Bills</option>
 </select>
 
+<input
+  type="date"
+  value={date}
+  onChange={(e) => setDate(e.target.value)}
+/>
 <button
   onClick={() => {
     if (editingIndex !== null) {
@@ -45,7 +51,8 @@ const total = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
       updatedExpenses[editingIndex] = {
         name: expenseName,
         amount: amount,
-        category: category
+        category: category,
+        date: date
       }
 
       setExpenses(updatedExpenses)
@@ -53,7 +60,7 @@ const total = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
     } else {
       setExpenses([
         ...expenses,
-        { name: expenseName, amount: amount, category: category }
+        { name: expenseName, amount: amount, category: category, date: date }
       ])
     }
 
@@ -79,12 +86,14 @@ const total = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
    <p>{expense.name}</p>
    <p>Rs. {expense.amount}</p>
    <p>{expense.category}</p>
+   <p>{expense.date}</p>
    <button
   onClick={() => {
     setEditingIndex(index)
     setExpenseName(expense.name)
     setAmount(expense.amount)
     setCategory(expense.category)
+    setDate(expense.date)
   }}
 >
   Edit

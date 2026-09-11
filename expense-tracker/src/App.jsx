@@ -5,6 +5,7 @@ function App() {
   const [expenseName, setExpenseName] = useState('')
 const [amount, setAmount] = useState('')
 
+const [editingIndex, setEditingIndex] = useState(null)
 const total = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
   return (
     <div>
@@ -26,23 +27,45 @@ const total = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
 />
 <button
   onClick={() => {
-    setExpenses([
-      ...expenses,
-      { name: expenseName, amount: amount }
-    ])
+    if (editingIndex !== null) {
+      const updatedExpenses = [...expenses]
+
+      updatedExpenses[editingIndex] = {
+        name: expenseName,
+        amount: amount
+      }
+
+      setExpenses(updatedExpenses)
+      setEditingIndex(null)
+    } else {
+      setExpenses([
+        ...expenses,
+        { name: expenseName, amount: amount }
+      ])
+    }
+
     setExpenseName('')
     setAmount('')
   }}
 >
-  Add Expense
+  {editingIndex !== null ? 'Update Expense' : 'Add Expense'}
 </button>
-      </div>
+</div>
 
       <div>
   {expenses.map((expense, index) => (
    <div key={index}>
    <p>{expense.name}</p>
    <p>Rs. {expense.amount}</p>
+   <button
+  onClick={() => {
+    setEditingIndex(index)
+    setExpenseName(expense.name)
+    setAmount(expense.amount)
+  }}
+>
+  Edit
+</button>
    <button
   onClick={() => {
     setExpenses(expenses.filter((_, i) => i !== index))

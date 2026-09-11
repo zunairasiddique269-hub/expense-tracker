@@ -50,6 +50,14 @@ const total = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
 >
   {editingIndex !== null ? 'Update Expense' : 'Add Expense'}
 </button>
+
+<button
+  onClick={() => {
+    setExpenses([])
+  }}
+>
+  Clear All
+</button>
 </div>
 
       <div>

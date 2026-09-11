@@ -34,6 +34,15 @@ const [amount, setAmount] = useState('')
   Add Expense
 </button>
       </div>
+
+      <div>
+  {expenses.map((expense, index) => (
+    <div key={index}>
+      <p>{expense.name}</p>
+      <p>Rs. {expense.amount}</p>
+    </div>
+  ))}
+</div>
     </div>
   )
 }

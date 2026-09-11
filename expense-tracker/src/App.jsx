@@ -14,6 +14,7 @@ const total = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
     <div>
       <h1>Expense Tracker</h1>
       <h2>Total: Rs. {total}</h2>
+      <h3>Total Expenses: {expenses.length}</h3>
 
       <div>
       <input

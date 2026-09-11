@@ -4,9 +4,12 @@ function App() {
   const [expenses, setExpenses] = useState([])
   const [expenseName, setExpenseName] = useState('')
 const [amount, setAmount] = useState('')
+
+const total = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
   return (
     <div>
       <h1>Expense Tracker</h1>
+      <h2>Total: Rs. {total}</h2>
 
       <div>
       <input

@@ -40,10 +40,17 @@ const total = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
 
       <div>
   {expenses.map((expense, index) => (
-    <div key={index}>
-      <p>{expense.name}</p>
-      <p>Rs. {expense.amount}</p>
-    </div>
+   <div key={index}>
+   <p>{expense.name}</p>
+   <p>Rs. {expense.amount}</p>
+   <button
+  onClick={() => {
+    setExpenses(expenses.filter((_, i) => i !== index))
+  }}
+>
+  Delete
+</button>
+ </div>
   ))}
 </div>
     </div>

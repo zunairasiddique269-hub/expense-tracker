@@ -6,6 +6,7 @@ function App() {
 const [amount, setAmount] = useState('')
 const [category, setCategory] = useState('Food')
 const [date, setDate] = useState('')
+const [searchTerm, setSearchTerm] = useState('')
 
 const [editingIndex, setEditingIndex] = useState(null)
 const total = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
@@ -42,6 +43,12 @@ const total = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
   type="date"
   value={date}
   onChange={(e) => setDate(e.target.value)}
+/>
+<input
+  type="text"
+  placeholder="Search expenses"
+  value={searchTerm}
+  onChange={(e) => setSearchTerm(e.target.value)}
 />
 <button
   onClick={() => {
@@ -81,7 +88,12 @@ const total = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
 </div>
 
       <div>
-  {expenses.map((expense, index) => (
+      {expenses
+.filter((expense) =>
+  expense.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  expense.category.toLowerCase().includes(searchTerm.toLowerCase())
+)
+  .map((expense, index) => (
    <div key={index}>
    <p>{expense.name}</p>
    <p>Rs. {expense.amount}</p>

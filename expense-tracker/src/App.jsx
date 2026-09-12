@@ -88,39 +88,57 @@ const total = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
 </button>
 </div>
 
-      <div>
+<div>
+  <table>
+    <thead>
+      <tr>
+        <th>Expense</th>
+        <th>Amount</th>
+        <th>Category</th>
+        <th>Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
       {expenses
-.filter((expense) =>
-  expense.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  expense.category.toLowerCase().includes(searchTerm.toLowerCase())
-)
-  .map((expense, index) => (
-   <div key={index}>
-   <p>{expense.name}</p>
-   <p>Rs. {expense.amount}</p>
-   <p>{expense.category}</p>
-   <p>{expense.date}</p>
-   <button
-  onClick={() => {
-    setEditingIndex(index)
-    setExpenseName(expense.name)
-    setAmount(expense.amount)
-    setCategory(expense.category)
-    setDate(expense.date)
-  }}
->
-  Edit
-</button>
-   <button
-  onClick={() => {
-    setExpenses(expenses.filter((_, i) => i !== index))
-  }}
->
-  Delete
-</button>
- </div>
-  ))}
+        .filter((expense) =>
+          expense.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          expense.category.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .map((expense, index) => (
+          <tr key={index}>
+            <td>{expense.name}</td>
+            <td>Rs. {expense.amount}</td>
+            <td>{expense.category}</td>
+            <td>{expense.date}</td>
+            <td>
+              <button
+                onClick={() => {
+                  setEditingIndex(index)
+                  setExpenseName(expense.name)
+                  setAmount(expense.amount)
+                  setCategory(expense.category)
+                  setDate(expense.date)
+                }}
+              >
+                Edit
+              </button>
+
+              <button
+                onClick={() => {
+                  setExpenses(expenses.filter((_, i) => i !== index))
+                }}
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        ))}
+    </tbody>
+  </table>
 </div>
+
     </div>
   )
 }

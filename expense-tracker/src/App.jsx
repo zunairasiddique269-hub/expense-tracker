@@ -13,9 +13,19 @@ const [editingIndex, setEditingIndex] = useState(null)
 const total = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
   return (
     <div>
-      <h1>Expense Tracker</h1>
-      <h2>Total: Rs. {total}</h2>
-      <h3>Total Expenses: {expenses.length}</h3>
+    <h1>Expense Tracker</h1>
+
+<div className="summary">
+  <div className="summary-card">
+    <h2>Total Spent</h2>
+    <p>Rs. {total}</p>
+  </div>
+
+  <div className="summary-card">
+    <h2>Total Expenses</h2>
+    <p>{expenses.length}</p>
+  </div>
+</div>
 
       <div>
       <input

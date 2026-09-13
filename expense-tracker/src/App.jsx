@@ -1,155 +1,194 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import ExpenseForm from './components/ExpenseForm'
+import ExpenseList from './components/ExpenseList'
+import SummaryCards from './components/SummaryCards'
+import { createId, getSummary, loadExpenses, saveExpenses } from './utils'
 import './App.css'
 
+const emptyForm = {
+  expenseName: '',
+  amount: '',
+  category: '',
+  date: '',
+}
+
 function App() {
-  const [expenses, setExpenses] = useState([])
-  const [expenseName, setExpenseName] = useState('')
-const [amount, setAmount] = useState('')
-const [category, setCategory] = useState('Food')
-const [date, setDate] = useState('')
-const [searchTerm, setSearchTerm] = useState('')
+  const [expenses, setExpenses] = useState(() => loadExpenses())
+  const [form, setForm] = useState(emptyForm)
+  const [errors, setErrors] = useState({})
+  const [searchTerm, setSearchTerm] = useState('')
+  const [editingId, setEditingId] = useState(null)
 
-const [editingIndex, setEditingIndex] = useState(null)
-const total = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
-  return (
-    <div>
-    <h1>Expense Tracker</h1>
+  useEffect(() => {
+    saveExpenses(expenses)
+  }, [expenses])
 
-<div className="summary">
-  <div className="summary-card">
-    <h2>Total Spent</h2>
-    <p>Rs. {total}</p>
-  </div>
+  const summary = useMemo(() => getSummary(expenses), [expenses])
 
-  <div className="summary-card">
-    <h2>Total Expenses</h2>
-    <p>{expenses.length}</p>
-  </div>
-</div>
+  const filteredExpenses = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase()
 
-      <div>
-      <input
-  type="text"
-  placeholder="Expense name"
-  value={expenseName}
-  onChange={(e) => setExpenseName(e.target.value)}
-/>
-<input
-  type="number"
-  placeholder="Amount"
-  value={amount}
-  onChange={(e) => setAmount(e.target.value)}
-/>
+    if (!query) {
+      return expenses
+    }
 
-<select
-  value={category}
-  onChange={(e) => setCategory(e.target.value)}
->
-  <option value="Food">Food</option>
-  <option value="Transport">Transport</option>
-  <option value="Shopping">Shopping</option>
-  <option value="Bills">Bills</option>
-</select>
+    return expenses.filter(
+      (expense) =>
+        expense.name.toLowerCase().includes(query) ||
+        expense.category.toLowerCase().includes(query),
+    )
+  }, [expenses, searchTerm])
 
-<input
-  type="date"
-  value={date}
-  onChange={(e) => setDate(e.target.value)}
-/>
-<input
-  type="text"
-  placeholder="Search expenses"
-  value={searchTerm}
-  onChange={(e) => setSearchTerm(e.target.value)}
-/>
-<button
-  onClick={() => {
-    if (editingIndex !== null) {
-      const updatedExpenses = [...expenses]
+  function resetForm() {
+    setForm(emptyForm)
+    setErrors({})
+    setEditingId(null)
+  }
 
-      updatedExpenses[editingIndex] = {
-        name: expenseName,
-        amount: amount,
-        category: category,
-        date: date
-      }
+  function handleChange(event) {
+    const { name, value } = event.target
+    setForm((current) => ({ ...current, [name]: value }))
+    setErrors((current) => ({ ...current, [name]: '' }))
+  }
 
-      setExpenses(updatedExpenses)
-      setEditingIndex(null)
+  function validateForm() {
+    const nextErrors = {}
+    const trimmedName = form.expenseName.trim()
+    const amountValue = Number(form.amount)
+
+    if (!trimmedName) {
+      nextErrors.expenseName = 'Please enter an expense name.'
+    }
+
+    if (form.amount === '' || form.amount === null) {
+      nextErrors.amount = 'Please enter an amount.'
+    } else if (!Number.isFinite(amountValue)) {
+      nextErrors.amount = 'Please enter a valid amount.'
+    } else if (amountValue <= 0) {
+      nextErrors.amount = 'Amount must be greater than 0.'
+    }
+
+    if (!form.category) {
+      nextErrors.category = 'Please select a category.'
+    }
+
+    if (!form.date) {
+      nextErrors.date = 'Please choose a date.'
+    }
+
+    setErrors(nextErrors)
+    return Object.keys(nextErrors).length === 0
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault()
+
+    if (!validateForm()) {
+      return
+    }
+
+    const expenseData = {
+      name: form.expenseName.trim(),
+      amount: Number(form.amount),
+      category: form.category,
+      date: form.date,
+    }
+
+    if (editingId) {
+      setExpenses((current) =>
+        current.map((expense) =>
+          expense.id === editingId ? { ...expense, ...expenseData } : expense,
+        ),
+      )
     } else {
-      setExpenses([
-        ...expenses,
-        { name: expenseName, amount: amount, category: category, date: date }
+      setExpenses((current) => [
+        ...current,
+        {
+          id: createId(),
+          ...expenseData,
+        },
       ])
     }
 
-    setExpenseName('')
-    setAmount('')
-  }}
->
-  {editingIndex !== null ? 'Update Expense' : 'Add Expense'}
-</button>
+    resetForm()
+  }
 
-<button
-  onClick={() => {
+  function handleEdit(expense) {
+    setForm({
+      expenseName: expense.name,
+      amount: String(expense.amount),
+      category: expense.category,
+      date: expense.date,
+    })
+    setErrors({})
+    setEditingId(expense.id)
+  }
+
+  function handleDelete(expense) {
+    const confirmed = window.confirm(`Delete "${expense.name}"?`)
+    if (!confirmed) {
+      return
+    }
+
+    setExpenses((current) => current.filter((item) => item.id !== expense.id))
+
+    if (editingId === expense.id) {
+      resetForm()
+    }
+  }
+
+  function handleClearAll() {
+    if (expenses.length === 0) {
+      return
+    }
+
+    const confirmed = window.confirm('Clear all expenses? This cannot be undone.')
+    if (!confirmed) {
+      return
+    }
+
     setExpenses([])
-  }}
->
-  Clear All
-</button>
-</div>
+    resetForm()
+  }
 
-<div>
-  <table>
-    <thead>
-      <tr>
-        <th>Expense</th>
-        <th>Amount</th>
-        <th>Category</th>
-        <th>Date</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
+  return (
+    <div className="app">
+      <header className="page-header">
+        <p className="eyebrow">Personal finance</p>
+        <h1>Expense Tracker</h1>
+        <p className="subtitle">
+          Record daily spending, search your history, and keep a clear view of totals.
+        </p>
+      </header>
 
-    <tbody>
-      {expenses
-        .filter((expense) =>
-          expense.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          expense.category.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-        .map((expense, index) => (
-          <tr key={index}>
-            <td>{expense.name}</td>
-            <td>Rs. {expense.amount}</td>
-            <td>{expense.category}</td>
-            <td>{expense.date}</td>
-            <td>
-              <button
-                onClick={() => {
-                  setEditingIndex(index)
-                  setExpenseName(expense.name)
-                  setAmount(expense.amount)
-                  setCategory(expense.category)
-                  setDate(expense.date)
-                }}
-              >
-                Edit
-              </button>
+      <SummaryCards
+        totalSpent={summary.totalSpent}
+        totalExpenses={summary.totalExpenses}
+        averageExpense={summary.averageExpense}
+        highestExpense={summary.highestExpense}
+      />
 
-              <button
-                onClick={() => {
-                  setExpenses(expenses.filter((_, i) => i !== index))
-                }}
-              >
-                Delete
-              </button>
-            </td>
-          </tr>
-        ))}
-    </tbody>
-  </table>
-</div>
+      <ExpenseForm
+        expenseName={form.expenseName}
+        amount={form.amount}
+        category={form.category}
+        date={form.date}
+        errors={errors}
+        isEditing={Boolean(editingId)}
+        onChange={handleChange}
+        onSubmit={handleSubmit}
+        onCancel={resetForm}
+      />
 
+      <ExpenseList
+        expenses={expenses}
+        filteredExpenses={filteredExpenses}
+        searchTerm={searchTerm}
+        onSearchChange={(event) => setSearchTerm(event.target.value)}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onClearAll={handleClearAll}
+      />
     </div>
   )
 }

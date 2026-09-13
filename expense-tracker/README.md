@@ -1,16 +1,27 @@
-# React + Vite
+# Expense Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A polished React + Vite expense tracker for recording daily spending, searching history, and reviewing totals.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Add, edit, and delete expenses
+- Categories: Food, Transport, Shopping, Bills, Other
+- Search by expense name or category
+- Dashboard stats: total spent, total expenses, average expense, and highest expense
+- Form validation and confirmation before delete or clear all
+- Data saved in `localStorage` so expenses persist after refresh
 
-## React Compiler
+## Getting started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm install
+npm run dev
+```
 
-## Expanding the ESLint configuration
+Open the local URL shown in the terminal, then add an expense to see the dashboard and table update.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Scripts
+
+- `npm run dev` — start the development server
+- `npm run build` — create a production build
+- `npm run preview` — preview the production build
